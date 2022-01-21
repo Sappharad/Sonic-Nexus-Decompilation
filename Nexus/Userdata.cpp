@@ -12,7 +12,20 @@ char modsPath[0x100];
 
 std::vector<ModInfo> modList;
 
+#if RETRO_PLATFORM != RETRO_OSX
 #include <filesystem>
+namespace fs = std::filesystem;
+#else
+    #include "TargetConditionals.h"
+    #if TARGET_CPU_ARM64
+    //Filesystem exists on all ARM Macs
+    #include <filesystem>
+    #elif TARGET_CPU_X86_64
+    //Filesystem does not exist before macOS 10.15 so use boost instead
+    #include <boost/filesystem.hpp>
+    #endif
+#endif
+
 #endif
 
 void InitUserdata()
@@ -339,8 +352,18 @@ void writeSettings() {
 
 #if RETRO_USE_MOD_LOADER
 #include <string>
-#if RETRO_PLATFORM == RETRO_ANDROID || RETRO_PLATFORM == RETRO_OSX
+#if RETRO_PLATFORM == RETRO_ANDROID
 namespace fs = std::__fs::filesystem;
+#elif RETRO_PLATFORM == RETRO_OSX
+    #if TARGET_CPU_ARM64
+    //Filesystem exists on all ARM Macs
+    #include <filesystem>
+    namespace fs = std::__fs::filesystem;
+    #elif TARGET_CPU_X86_64
+    //Filesystem does not exist before macOS 10.15 so use boost instead
+    #include <boost/filesystem.hpp>
+    namespace fs = boost::filesystem;
+    #endif
 #else
 namespace fs = std::filesystem;
 #endif
@@ -372,7 +395,7 @@ void initMods()
         try {
             auto rdi = fs::directory_iterator(modPath);
             for (auto de : rdi) {
-                if (de.is_directory()) {
+                if (fs::is_directory(de)) {
                     fs::path modDirPath = de.path();
 
                     ModInfo info;
@@ -459,7 +482,7 @@ bool loadMod(ModInfo *info, std::string modsPath, std::string folder, bool activ
             try {
                 auto data_rdi = fs::recursive_directory_iterator(dataPath);
                 for (auto data_de : data_rdi) {
-                    if (data_de.is_regular_file()) {
+                    if (fs::is_regular_file(data_de)) {
                         char modBuf[0x100];
                         StrCopy(modBuf, data_de.path().string().c_str());
                         char folderTest[4][0x10] = {
@@ -507,7 +530,7 @@ bool loadMod(ModInfo *info, std::string modsPath, std::string folder, bool activ
             try {
                 auto data_rdi = fs::recursive_directory_iterator(scriptPath);
                 for (auto data_de : data_rdi) {
-                    if (data_de.is_regular_file()) {
+                    if (fs::is_regular_file(data_de)) {
                         char modBuf[0x100];
                         StrCopy(modBuf, data_de.path().string().c_str());
                         char folderTest[4][0x10] = {
