@@ -44,13 +44,7 @@ data.bin
 #dependencies
 [Dd]ependencies/win-uwp/**
 [Dd]ependencies/windows/*
-[Dd]ependencies/mac/*
-![Dd]ependencies/mac/[Ii]nfo.plist
 [Dd]ependencies/ios/*
-
-SonicCDDecompUWP/Generated Files
-SonicCDDecompUWP/BundleArtifacts
-SonicCDDecompUWP/Assets/*.png
 
 # Visual Studio 2015 cache/options directory
 .vs/

@@ -339,7 +339,7 @@ void writeSettings() {
 
 #if RETRO_USE_MOD_LOADER
 #include <string>
-#if RETRO_PLATFORM == RETRO_ANDROID
+#if RETRO_PLATFORM == RETRO_ANDROID || RETRO_PLATFORM == RETRO_OSX
 namespace fs = std::__fs::filesystem;
 #else
 namespace fs = std::filesystem;
